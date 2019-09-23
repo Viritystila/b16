@@ -29,6 +29,7 @@
      [1 r [r r 1 r] r ]
      [[1 r 1 r] 1 r [1 1 1 r]]
      [[1 1 1 1] r [r r 1 r]  r ]
+     ;[[(rep 16 1)] r r [(rep 8 1)]]
      ;[[(rep 16 1)] [(rep 8 1)] [[(rep 8 1)] r [(rep 8 1)] r]  [(rep 64 1)] ]
      :in-trg2  [r 1 r 1]
      :in-buf1  ["b bd1"]          ;(fll 16 ["b bd3" "b sn1"  "b bd5"  "b sn2"])
@@ -41,7 +42,7 @@
 (trg! :smp2 :fxe trg-fx-distortion2
       :in-amount [0.99] )
 
-(volume! :smp2 1)
+(volume! :smp2 2)
 
 (stp :fxe)
 
@@ -56,15 +57,17 @@
 
 
 (trg :smp smp
-     :in-trg [[1 r 1 r] [1 r 1 r] [1 r 1 r] [1 1 [1 1 1 r] r]]
-     [[1 1 1 1] [1 r 1 r] [1 r 1 r] [1 r 1 r]]
+     :in-trg [[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
+     [[2 2 2 2] [2 r 2 r] [2 r 2 r] [2 r 2 r]]
+     :in-step ":in-trg"
       :in-buf ["b hc4" "b hc3" "b hc4" "b hc3"] )
 
 (volume! :smp 0.125)
 
-(trg! :smp :fxe1 trg-fx-distortion2
-      :in-amount [0.95] )
+(trg! :smp :fxe1 trg-fx-bitcrusher
+      :in-bits [8] )
 
+(stp :fxe1)
 
 (stp :smp)
 
@@ -79,6 +82,18 @@
 (println (slw 4 (map  (fn [x] (str "n " (name x))) (map find-note-name (chd :i :e2 :melodic-minor 8))) ) )
 
 
+(odoc trig)
+
+(sta)
+(trg :op overpad
+     :in-trg [1 1 1 1] [0] [0] [0]
+     :in-note ["n a2"] ["n c3"] ["n d3"] [[(chr :c3 :7sus4) ] r (rev [(chr :c4 :7sus4)]) r]
+     :in-gate-select [0]                 ;(rep 16 [1]) (rep 16 [0])
+     :in-attack [0.25]
+     :in-decay  [0.2]
+     :in-sustain [0.2]
+     :in-release [10.75]
+     :in-amp [1])
 
 
 (trg :bow2
@@ -112,8 +127,9 @@
 
 (chd :i :e1 :ionian 8)
 
-(chr :c1 :7sus4)
+(println (map find-note-name (chr :c1 :7sus4)))
 
+(stp :bow2)
 
 ;;;;;;
 ;;KKSKSKKAAAAAAAAAAAAAAAAWseeeeeeeee
@@ -123,7 +139,7 @@
        bowed
        :in-trg  [(rep 16 1)]; [(rep 4 1)]  ;[(rep 4 1)]
        :in-amp [0.81]
-       :in-note  [28] [26] [24]
+       :in-note  ["nc1"] ["ng1"] ["nbb1"]
        :in-gate-select [1]
        :in-bow-offset [0.01]
        :in-bow-position  [0.8]
@@ -137,7 +153,7 @@
        bowed
        :in-trg  [(rep 16 1)]  [(rep 4 1)] ; [(rep 64 1)] [(rep 128 1)] [(rep 264 1)] [(rep 512 1)]
        :in-amp [0.81]
-       :in-note  [32] [33] [31]
+       :in-note  ["nf1"] ["nbb1"] ["nc1"]
        :in-gate-select [1]
        :in-bow-offset [0.01]
        :in-bow-position  [0.8]
@@ -149,9 +165,9 @@
 
   (trg :bow2c
        bowed
-       :in-trg  [(rep 16 1)] [(rep 8 1)]  ;[(rep 4 1)]
+       :in-trg  [(rep 16 1)] [(rep 8 1)] (fll 16 [r 1]) ;[(rep 4 1)]
        :in-amp [0.81]
-       :in-note  [33] [31] [28]
+       :in-note   ["nf2"] ["nbb2"] ["ng2"]
        :in-gate-select [1]
        :in-bow-offset [0.01]
        :in-bow-position  [0.8]
@@ -160,12 +176,13 @@
        :in-vib-gain [0.19]
        :in-amp [5]))
 
+(fll 16 [r 1])
 
 (do
   (trg! :bow2 :bow2e trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.1])
 
   (trg! :bow2 :bow2d trg-fx-distortion2
-        :in-amount [0.9] )
+        :in-amount [0.7] )
 
 
   (trg! :bow2b :bow2e trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.1])
@@ -177,7 +194,7 @@
   (trg! :bow2c :bow2e trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.11])
 
   (trg! :bow2c :bow2d trg-fx-distortion2
-        :in-amount [0.9] ))
+        :in-amount [0.3] ))
 
 
 
@@ -187,7 +204,8 @@
                                         ; [[r r r 1] [r 1 1 r r r r r]]
      [(rep 16 1)]
      ;[(rep 32 1)]
-       :in-f3 [300 400 300 300 500 600 500 400]
+     :in-f3  [ "fc1" "fg1" "f f1" "fbb1"]
+      [ "fc2" "fg2" "ff2" "fbb2"]
      :in-amp [0.3])
 
 
@@ -199,6 +217,9 @@
      (rep 2 [(rep 4 1)])
      [(rep 16 1)]
      :in-amp [0.1])
+
+
+(stp :kick2)
 
 
 (volume! :bow2 0.3)
@@ -279,7 +300,7 @@
     (replace-out out-bus (pan2 snd))))
 
 
-(trg! :smp :smps trg-fx-pitch-shift
+(trg! :ksmp :smps trg-fx-pitch-shift
       :in-pitch-ratio  [0.1 0.1 [4 4] 0.1 0.1 [4 4] 0.1 0.1]
       :in-pitch-dispersion [1]
       :in-time-dispersion [0])
