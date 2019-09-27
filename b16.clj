@@ -17,6 +17,7 @@
     (add-sample name (string-to-buffer (generate-markov-text path nosamples)))
     (println "Sample" name "loaded") ))
 
+(odoc scope-out)
 
 ;;;;;;
 ;;Raahaaoooaaaaaaaaaaaaaaeeeeeeee0000000000!
@@ -24,11 +25,12 @@
 
 (add-tts-sample "k"  "generalx2paradisedaqx2.txt" 200)
 
+
 (trg :smp2 smp2
      :in-trg1 [1 r [r r 1 r] [r r 1 r]]
      [1 r [r r 1 r] r ]
      [[1 r 1 r] 1 r [1 1 1 r]]
-     [[1 1 1 1] r [r r 1 r]  r ]
+     [[1 1 r 1] r [r r 1 r]  r ]
      ;[[(rep 16 1)] r r [(rep 8 1)]]
      ;[[(rep 16 1)] [(rep 8 1)] [[(rep 8 1)] r [(rep 8 1)] r]  [(rep 64 1)] ]
      :in-trg2  [r 1 r 1]
@@ -86,25 +88,26 @@
 
 (sta)
 (trg :op overpad
-     :in-trg [1 1 1 1] [0] [0] [0]
-     :in-note ["n a2"] ["n c3"] ["n d3"] [[(chr :c3 :7sus4) ] r (rev [(chr :c4 :7sus4)]) r]
+     :in-trg (mapv (fn [x] (if (number? x) (* x 1) x )) [0.25 0.25 r 0.25]) [0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125]
+     :in-note ["n a2"] ["n c3"] ["n d3"] (rep 4 [r]) [[(chr :c3 :7sus4) ] r (rev [(chr :c4 :7sus4)]) r]
      :in-gate-select [0]                 ;(rep 16 [1]) (rep 16 [0])
-     :in-attack [0.25]
-     :in-decay  [0.2]
-     :in-sustain [0.2]
-     :in-release [10.75]
+     :in-attack [0.03]
+     :in-decay  [1.0001]
+     :in-sustain [0.4]
+     :in-release [0.3]
      :in-amp [1])
 
 
 (trg :bow2
      bowed
      :in-trg   (fst 2 [[1 r 1 r] [1 r 1 r] [1 r 1 r] [1 1 [1 1 1 r] r]])
-     (rep 3 [r])
+     ;(rep 3 [r])
      ;[[1 1 1 1] [1 r 1 r] [1 r 1 r] [1 r 1 r]]
      ; [1 r [r r 1 r] [r r 1 r]]
      ; (fst 8 [1 r [r r 1 r] r ])
      ;[[1 r 1 r] 1 r [1 1 1 r]]
-     ;(fst 2  [[1 1 1 1] r [r r 1 r]  r ])
+                                        ;(fst 2  [[1 1 1 1] r [r r 1 r]  r ])
+     [0.25 0.25 0.25 0.25]
      :in-amp [0.81]
      :in-note  ["n a2"]
     ["n a2" "n c2"]
@@ -122,7 +125,7 @@
      :in-bow-position  [0.8]
      :in-bow-slope [1]
      :in-vib-freq [0.127]
-     :in-vib-gain [10.19]
+     :in-vib-gain [0.19]
      :in-amp [5])
 
 (chd :i :e1 :ionian 8)
@@ -137,9 +140,9 @@
 (do
   (trg :bow2
        bowed
-       :in-trg  [(rep 16 1)]; [(rep 4 1)]  ;[(rep 4 1)]
+       :in-trg  [(rep 16 1)] ;[(rep 4 1)]  ;[(rep 4 1)]
        :in-amp [0.81]
-       :in-note  ["nc1"] ["ng1"] ["nbb1"]
+       :in-note  ["nc1"] ["ng1"] ["nc1"]
        :in-gate-select [1]
        :in-bow-offset [0.01]
        :in-bow-position  [0.8]
@@ -151,7 +154,7 @@
 
   (trg :bow2b
        bowed
-       :in-trg  [(rep 16 1)]  [(rep 4 1)] ; [(rep 64 1)] [(rep 128 1)] [(rep 264 1)] [(rep 512 1)]
+       :in-trg  [(rep 16 1)] [(rep 4 1)]  [(fll 32 [r r 1 1])] ; [(rep 128 1)] [(rep 264 1)] [(rep 512 1)]
        :in-amp [0.81]
        :in-note  ["nf1"] ["nbb1"] ["nc1"]
        :in-gate-select [1]
@@ -167,7 +170,7 @@
        bowed
        :in-trg  [(rep 16 1)] [(rep 8 1)] (fll 16 [r 1]) ;[(rep 4 1)]
        :in-amp [0.81]
-       :in-note   ["nf2"] ["nbb2"] ["ng2"]
+       :in-note   ["nbb2"] ["nbb2"] ["ng2"]
        :in-gate-select [1]
        :in-bow-offset [0.01]
        :in-bow-position  [0.8]
@@ -182,34 +185,75 @@
   (trg! :bow2 :bow2e trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.1])
 
   (trg! :bow2 :bow2d trg-fx-distortion2
-        :in-amount [0.7] )
+        :in-amount [0.95] )
 
 
-  (trg! :bow2b :bow2e trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.1])
+  (trg! :bow2b :bow2be trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.1])
 
-  (trg! :bow2b :bow2d trg-fx-distortion2
+  (trg! :bow2b :bow2bd trg-fx-distortion2
         :in-amount [0.9] )
 
 
-  (trg! :bow2c :bow2e trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.11])
+  (trg! :bow2c :bow2ce trg-fx-echo  :in-delay-time (slw 4 [(range 0.01 0.1 0.01)]) :in-amp [0.11])
 
-  (trg! :bow2c :bow2d trg-fx-distortion2
-        :in-amount [0.3] ))
+  (trg! :bow2c :bow2cd trg-fx-distortion2
+        :in-amount [0.67] )
+
+  )
+
+(sta)
+
+(do
+  (stp :bow2)
+  (stp :bow2b)
+  (stp :bow2c))
 
 
+(trg :gb
+     grunge-bass
+     :in-trg
+     (rep 1 [(rep 16 "nc2")])
+     (rep 1 [(rep 16 "ng2")])
+     (rep 1 [(rep 16 "nbb2")])
+     (rep 1 [(rep 16 "nf2")])
+     :in-gate-select  [1]
+     :in-amp [1]
+     :in-note  ":in-trg"
+     :in-a [0.001]
+     :in-d [0.93]
+     :in-s [0.95]
+     :in-r [0.25]; (slw 32 [(range 0.1 1 0.01)])
+     )
+
+(trg! :gb :gbd trg-fx-distortion2
+        :in-amount [0.95] )
+
+(stp :gbd)
+
+(trg! :gb :gbe trg-fx-echo
+      :in-delay-time [0.2] :in-amp [0.5])
+
+(stp :gb)
+
+(volume! :gb 1)
 
 
-(trg :kick kick :in-trg ; [[1 1 1 r r r r r] 1]
-      ; [(rep 16 [r 1] )]
-                                        ; [[r r r 1] [r 1 1 r r r r r]]
-     [(rep 16 1)]
-     ;[(rep 32 1)]
+(trg :kick kick :in-trg    (rep 7 [(rep 16 1 )])
+     [1 r 1 [1 1] 1 r 1 1 1 1 (acc [(rep 8 1)]) 1 1 1 1 [1 1 1 1]]
      :in-f3  [ "fc1" "fg1" "f f1" "fbb1"]
-      [ "fc2" "fg2" "ff2" "fbb2"]
+     [ "fc2" "fg2" "ff2" "fbb2"]
+     [[ "fc3" "fg3" "ff3" "fbb3"]
+      [ "fc3" "fg3" "ff3" "fbb3"]
+      [ "fc4" "fg3" "ff2" "fbb1"]]
      :in-amp [0.3])
 
 
 
+(volume! :kick 0.25)
+
+(stp :kick)
+
+(acc 2 [1 2 3])
 (trg :kick2 kick :in-trg ; [[1 1 1 r r r r r] 1]
       ; [(rep 16 [r 1] )]
                                         ; [[r r r 1] [r 1 1 r r r r r]]
@@ -232,7 +276,7 @@
      :in-trg  [r]
      :in-loop [1]
      :in-buf ["b k"]
-     :in-amp [13]
+     :in-amp [2]
      )
 
  (trg! :ksmp :ksmpd trg-fx-distortion2
@@ -242,74 +286,6 @@
 (slw 2 (chr :e3 :7sus4))
 
 (sta)
-
-(defsynth ss [freq 400] (out 0 (pan2 (sin-osc freq))))
-
-(def ssf (ss))
-
-(node-pause (:id ssf))
-
-(node-start (:id ssf))
-
-
-
-(node-pause 233)
-
-(node-start 233)
-
-
-(:instance-fn (to-id ssf))
-
-(active-synths ssf)
-
-(:id ssf)
-
-(pp-node-tree)
-
-(kill ssf)
-
-
-
-(trg :smp smp
-     :in-trg (rep 15 [r]) [r]
-     :in-buf ["b k"]
-     :in-loop [1]
-     :in-step [2]
-     )
-
-
-(defsynth trg-fx-pitch-shift
-  "A pitch shifter"
-  [bus-in 0
-   in-pitch-ratio 1.0
-   in-pitch-dispersion 0.0
-   in-time-dispersion 0.0
-   in-pitch-ratio-val 1.0
-   in-pitch-dispersion-val 0.0
-   in-time-dispersion-val 0.1
-   in-out-select 0
-   in-out-select-val 0
-   out-bus 0]
-  (let [src               (in bus-in)
-        pitch-ratio       (in:kr in-pitch-ratio-val)
-        pitch-dispersion  (in:kr in-pitch-dispersion-val)
-        time-dispersion   (in:kr in-time-dispersion-val)
-        window-cize       0.05
-        sig               (pitch-shift src window-cize pitch-ratio pitch-dispersion time-dispersion)
-        snd (select (in:kr in-out-select-val) [sig src])]
-    (replace-out out-bus (pan2 snd))))
-
-
-(trg! :ksmp :smps trg-fx-pitch-shift
-      :in-pitch-ratio  [0.1 0.1 [4 4] 0.1 0.1 [4 4] 0.1 0.1]
-      :in-pitch-dispersion [1]
-      :in-time-dispersion [0])
-
-(volume! :smp 3)
-
-(stp :smps)
-
-(odoc pitch)
 
 
 (defsynth trg-fx-pitch-follow [bus-in 0
