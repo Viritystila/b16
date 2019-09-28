@@ -17,7 +17,6 @@
     (add-sample name (string-to-buffer (generate-markov-text path nosamples)))
     (println "Sample" name "loaded") ))
 
-(odoc scope-out)
 
 ;;;;;;
 ;;Raahaaoooaaaaaaaaaaaaaaeeeeeeee0000000000!
@@ -35,16 +34,16 @@
      ;[[(rep 16 1)] [(rep 8 1)] [[(rep 8 1)] r [(rep 8 1)] r]  [(rep 64 1)] ]
      :in-trg2  [r 1 r 1]
      :in-buf1  ["b bd1"]          ;(fll 16 ["b bd3" "b sn1"  "b bd5"  "b sn2"])
-     :in-buf2 ["b sn1"] ["b sn9"]
+     :in-buf2 ["b sn1" "b sn3" ] ["b sn9"]
      :in-step1 [2]
      :in-loop1 [0]
      :in-amp1 [1.0]
      :in-amp2 [0.27])
 
 (trg! :smp2 :fxe trg-fx-distortion2
-      :in-amount [0.99] )
+      :in-amount [0.94] )
 
-(volume! :smp2 2)
+(volume! :smp2 0.15)
 
 (stp :fxe)
 
@@ -64,7 +63,7 @@
      :in-step ":in-trg"
       :in-buf ["b hc4" "b hc3" "b hc4" "b hc3"] )
 
-(volume! :smp 0.125)
+(volume! :smp 0.075)
 
 (trg! :smp :fxe1 trg-fx-bitcrusher
       :in-bits [8] )
@@ -84,19 +83,22 @@
 (println (slw 4 (map  (fn [x] (str "n " (name x))) (map find-note-name (chd :i :e2 :melodic-minor 8))) ) )
 
 
-(odoc trig)
-
 (sta)
+
 (trg :op overpad
-     :in-trg (mapv (fn [x] (if (number? x) (* x 1) x )) [0.25 0.25 r 0.25]) [0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125]
-     :in-note ["n a2"] ["n c3"] ["n d3"] (rep 4 [r]) [[(chr :c3 :7sus4) ] r (rev [(chr :c4 :7sus4)]) r]
+     :in-trg [1]
+                                        ;(mapv (fn [x] (if (number? x) (* x 8) x )) [0.25 0.25 r 0.25])
+     ;[0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125]
+     ;(fst 2 [0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125])
+     :in-note ["n a2"] ["n c3"] ["n d3"]   (slw 2 [[(chr :c3 :7sus4) ] r (rev [(chr :d3 :7sus4)]) r])
      :in-gate-select [0]                 ;(rep 16 [1]) (rep 16 [0])
-     :in-attack [0.03]
+     :in-attack [0.001]
      :in-decay  [1.0001]
-     :in-sustain [0.4]
-     :in-release [0.3]
+     :in-sustain [1.4]
+     :in-release [10.3]
      :in-amp [1])
 
+(volume! :op 0.5)
 
 (trg :bow2
      bowed
@@ -119,7 +121,6 @@
     ["n e2" "n b2"]
     (slw 4 (map  (fn [x] (str "n " (name x))) (map find-note-name (chd :i :e2 :ionian 8) )) )
 (slw 2 (chr :e3 :7sus4))
-     ;(trigger.algo/chd :i :g)
      :in-gate-select [1]
      :in-bow-offset [0.01]
      :in-bow-position  [0.8]
@@ -288,6 +289,10 @@
 (sta)
 
 
+(trg :tick ping :in-trg [(rep 60 1)] :in-amp [0])
+
+(stp :tick)
+
 (defsynth trg-fx-pitch-follow [bus-in 0
                                out-bus 0]
   (let [src                   (in bus-in)
@@ -312,3 +317,42 @@
 (odoc pitch)
 
 (sta)
+
+
+(t/start "./b16.glsl" :width 1920 :height 1080 :cams [0] :videos ["../videos/soviet1.mp4" "../videos/uni_fixed.mp4" "../videos/soviet4.mp4" "../videos/spede_fixed.mp4"])
+
+(t/bufferSection 0 0 16925)
+
+(t/set-video-fixed 0 :fw)
+
+(t/bufferSection 1 0 6460)
+
+(t/set-video-fixed 1 :fw)
+
+(def abm (audio-bus-monitor (get-out-bus :smp2)))
+
+(on-trigger (get-trigger-id :tick :in-trg) (fn [val]
+                                             (let [obv  @abm]
+                                               ;(println obv)
+                                               (t/set-dataArray-item 0 obv)))
+            :smp2_obv)
+
+(remove-event-handler :smp2_obv)
+
+(pause! :smp2)
+
+(play! :smp2)
+
+(def opabm (audio-bus-monitor (get-out-bus :op)))
+
+
+
+(on-trigger (get-trigger-id :tick :in-trg) (fn [val]
+                                             (let [obv  @opabm]
+                                               ;(println obv)
+                                               (t/set-dataArray-item 1 obv)))
+            :op_obv)
+
+(pause! :op)
+
+(play! :op)
