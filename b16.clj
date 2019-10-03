@@ -365,19 +365,6 @@
 
 (defn isno [x] (if (number? x) [x]  (apply conj x)))
 
-(defn map-in_old [input fnc & args]
-  (let [;_ (println "args " (apply conj args))
-        args (apply concat args)
-        _ (println "rgs"  args)
-        ](loop [xv     (vec input)
-                       result []]
-           (if xv
-             (let [fst     (first xv) ]
-               (if (vector? fst) (recur (next xv) (conj result (vec (apply map-in (flatten [fst fnc args])))))
-                   (if (seq? fst) (recur (next xv) (apply conj result  (vec (apply map-in (flatten [fst fnc args])))))
-                       (recur (next xv) (conj result (apply fnc (flatten (concat   (isno args)  [fst])))))))) result ))))
-
-
 
 (defn map-inner [input fnc & args]
   (let [;_ (println "input" input)
@@ -390,10 +377,11 @@
             (if xv
               (let [fst    (first xv)
                     targs  ()]
-                (if (number? fst) (recur (next xv)  (conj result (apply fnc (flatten (conj [fst] args))))) (recur (next xv) (conj result (apply map-in (seq [fst fnc args]))) )) ) result))
-    ;(println (flatten (conj [input] args)) )
-    ;(apply fnc args)
-    ))
+                (if (or (number? fst) (string? fst))
+                  (if (number? fst)
+                    (recur (next xv) (conj result (apply fnc (flatten (conj [fst] args)))))
+                    (recur (next xv) (conj result fst)))
+                  (recur (next xv) (conj result (apply map-in (seq [fst fnc args]))) )) ) result))))
 
 
 (defn map-in [input fnc & args]
@@ -415,13 +403,13 @@
 
 (conj [1 1 2 3] 9)
 
-(map-in [5 2 3 [9 8] [(rep 4 22)] ] scls 2 1)
+(map-in [5 2 3 [9 8] r [(rep 4 22)] ] scls 2 1)
 
 (apply scls '(1 2 3))
 
 (trg :gb2
      vintage-bass
-     :in-trg (map-in [1 1 [r 1] 1] scl 0.125) ;[1 1 1 1] ;[[1 1 r 1] 1 [1 r 1  1] 1] [1 [1 [1 1]] r [1 [1 1]]]
+     :in-trg (map-in [1 1 [r 1] [(rep 4 1)]] scl 0.05) ;[1 1 1 1] ;[[1 1 r 1] 1 [1 r 1  1] 1] [1 [1 [1 1]] r [1 [1 1]]]
      ;[(rep 32 1) r 1 (rep 8 1)]
      ; [1 [(rep 16 1)] r [1 1 1 1]]
     ;[(evr 4 1 (partition 1 (sfl (fll 16 [[1] [1] [r]]))))]
@@ -432,7 +420,7 @@
      ;(rep 1 [(rep 16 "nbb2")])
      ;(rep 1 [(rep 16 "nf3")])
      :in-a [0.001]
-     :in-d [0.0093]
+     :in-d [0.093]
      :in-s [0.95]
      :in-r [0.175]; (slw 32 [(range 0.1 1 0.01)])
      )
