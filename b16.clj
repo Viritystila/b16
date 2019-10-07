@@ -102,39 +102,41 @@
 
 (volume! :op 0.25)
 
-(trg :bow2
+
+;Noise guitar
+(trg :bow2o
      bowed
-     :in-trg   (fst 2 [[1 r 1 r] [1 r 1 r] [1 r 1 r] [1 1 [1 1 1 r] r]])
-     (rep 3 [r])
-     ;[[1 1 1 1] [1 r 1 r] [1 r 1 r] [1 r 1 r]]
-     ; [1 r [r r 1 r] [r r 1 r]]
-     ; (fst 8 [1 r [r r 1 r] r ])
-     ;[[1 r 1 r] 1 r [1 1 1 r]]
-                                        ;(fst 2  [[1 1 1 1] r [r r 1 r]  r ])
-     ;[0.25 0.25 0.25 0.25]
+     :in-trg  (map-in [[1 1 r 1] [1 1] [1 1] [1 r 1 1] ] scl 0.06125 ) (map-in [(rep 8 1 )] scl (/ 1 8))
      :in-amp [0.81]
-     :in-note  ["n a2"]
-    ["n a2" "n c2"]
-    ["n b2"]
-    ["n b2" "n d2"]
-    ["n a3"]
-    ["n a3" "n f2"]
-    ["n e2"]
-    ["n e2" "n b2"]
-    (slw 4 (map  (fn [x] (str "n " (name x))) (map find-note-name (chd :i :e2 :ionian 16) )) )
-     :in-gate-select [1]
-     :in-bow-offset [0.01]
-     :in-bow-position  [0.8]
+     :in-note  ["n c0" "n c1"]  ["n g0" "n c1"] ["n f0" "n f1"] ["n bb0"]
+      ["n c1"]  ["n g1" "n f0"] ["n f1"] ["n bb1" "n f0"]
+     :in-gate-select [0]
+     :in-bow-offset [0.1]
+     :in-bow-position  [1.18]
      :in-bow-slope [1]
      :in-vib-freq [0.127]
-     :in-vib-gain [0.19]
+     :in-vib-gain [0.0019]
      :in-amp [1])
+
+
+
+
+(trg! :bow2o :bow2oe trg-fx-echo :in-decay-time [0.125]  :in-delay-time [0.1] :in-amp [0.2])
+
+(trg! :bow2o :bow2od trg-fx-distortion2
+        :in-amount [0.99999] )
+
+(volume! :bow2o 0.05)
 
 (chd :i :e1 :ionian 8)
 
 (println (map find-note-name (chr :c1 :7sus4)))
 
-(stp :bow2)
+(stp :bow2o)
+
+(sta)
+;;;;;;
+
 
 ;;;;;;
 ;;KKSKSKKAAAAAAAAAAAAAAAAWseeeeeeeee
@@ -272,22 +274,28 @@
 (stp :bow2)
 
 
+(add-sample "uh" (string-to-buffer "UHHHHHHHHAAAAAAAAAAAA"))
 
 (trg :ksmp smp
-     :in-trg  [r]
+     :in-trg   (rep 3 [1 r 1 r])
+     [1 r 1 [1 1 1 1] 1 r 1 1 1 1 (acc [(rep 8 1)]) 1 1 1 1 [1 1 1 1]]
+     ;(acc [(rep 8 1)])
      :in-loop [1]
-     :in-buf ["b k"]
+     :in-buf ["b uh"]
      :in-amp [2]
+     :in-step (fst 128 [(range 1.5 2.5 0.25)])
      )
 
  (trg! :ksmp :ksmpd trg-fx-distortion2
-       :in-amount (slw 8 [(range 0.1 0.9 0.05)]))
+       :in-amount (slw 8 [(range 0.1 0.95 0.05)]))
 
+(volume! :ksmp 0.5)
 
 (slw 2 (chr :e3 :7sus4))
 
 (sta)
 
+(stp :ksmp)
 
 (trg :tick ping :in-trg [(rep 60 1)] :in-amp [0])
 
@@ -322,36 +330,26 @@
                                         ;,;;;;bddddddrrrrrrrrmmsss
 
 (trg :samplDrum smp
-     :in-trg; ["sn3"  "bd1"] (rep 3 [r])
-    (rep 3 [["b bd1" "b sn2"]  [r ["b bd2" "b sn2"]]])
-    [(evr 3 "b bass23" (partition 1 (sfl (fll 8 [["b bd2"] ["b sn3"] [r]]))))]
-
-    (rep 3 [["b bd1" "b sn2"]  [r ["b bd2" ["b sn2" "b sn2"]]]])
-    [(evr 3 "b bass23" (partition 1 (sfl (fll 8 [["b bd2"] ["b sn3"] [r]]))))]
-
-
-    (rep 3 [["b bd1" "b sn2"] [r ["b bd2" [(rep 1 "b sn2")]]]])
-    [(evr 5 "b bass23" (partition 1 (sfl (fll 16 [["b bd2"] ["b sn2"] [r]]))))]
-
-    (rep 3 [["b bd1" "b sn2"] [r ["b bd2" ["b bd2" "b sn2"]]]])
-    [(evr 5 "b bass24" (partition 1 (sfl (fll 16 [["b bd4"] ["b sn3"] [r]]))))]
-
-    ;(rep 3 [["b bd1" "b sn2"] [r ["b bd2" [(rep 1 "b sn2")]]]])
-    ; [(evr 2 "b bass24" (partition 1  (fll 16 [["b bd2"] ["b sn3" "b sn2"] [r]])))]
+     :in-trg
+     (rep 3 ["b bd1"  "b sn2" [r r "b bd1" r] [ "b sn2" r "b bd1" r]])
+    ;(rep 2 [["b bd1" "b sn2"]  [r ["b bd2" "b sn2"]]])
+    [(evr 3 "b bass23" (partition 2 (sfl (fll 16 [["b bd2"] ["b sn3"] [r]]))))]
+   ; (rep 1 [["b bd1" "b sn2"]  [r ["b bd2" "b sn2"]]])
+    ;; (rep 3 [["b bd1" "b sn2"]  [r ["b bd2" ["b sn2" "b sn2"]]]])
+    ;; [(evr 3 "b bass23" (partition 1 (sfl (fll 8 [["b bd2"] ["b sn3"] [r]]))))]
 
 
-    ;(rep 2 [["b bd1" "b sn2"] [r ["b bd2" [(rep 1 "b sn2")]]]])
-    ;[(evr 1 "b bass23" (partition 1 (sfl (fll 8 [["b bd2"] ["b sn2" "b sn3"] [r]]))))];
-    ;[(evr 1 "b bass24" (partition 1 (sfl (fll 16 [["b bd2"] ["b sn3"] [r]]))))];
+    ;; (rep 3 [["b bd1" "b sn2"] [r ["b bd2" [(rep 1 "b sn2")]]]])
+    ;; [(evr 5 "b bass23" (partition 1 (sfl (fll 16 [["b bd2"] ["b sn2"] [r]]))))]
 
-    (rep 3 [["b bd1" "b sn2"] [r ["b bd2" [(rep 1 "b sn2")]]]])
-    [(evr 4 "b bass23" (partition 1 (sfl (fll 8 [["b bd2"] ["b sn2"] [r]]))))]
+    ;; (rep 3 [["b bd1" "b sn2"] [r ["b bd2" ["b bd2" "b sn2"]]]])
+    ;; [(evr 5 "b bass24" (partition 1 (sfl (fll 16 [["b bd4"] ["b sn3"] [r]]))))]
 
-    (rep 3 [["b bd1" "b sn2"] [r ["b bd2" ["b bd2" "b sn2"]]]])
-    [(evr 1 "b bass24" (partition 1 (sfl (fll 8 [["b bd4"] ["b sn3"] [r]]))))]
+    ;; (rep 3 [["b bd1" "b sn2"] [r ["b bd2" [(rep 1 "b sn2")]]]])
+    ;; [(evr 4 "b bass23" (partition 1 (sfl (fll 8 [["b bd2"] ["b sn2"] [r]]))))]
 
-    ;(rep 3 [["b bd1" "b sn2"] [r ["b bd2" [(rep 1 "b sn2")]]]])
-    ;[(evr 4 "b bass24" (partition 1  (fll 8 [["b bd2"] ["b sn4" "b sn2"] [r]])))]
+    ;; (rep 3 [["b bd1" "b sn2"] [r ["b bd2" ["b bd2" "b sn2"]]]])
+    ;; [(evr 1 "b bass24" (partition 1 (sfl (fll 8 [["b bd4"] ["b sn3"] [r]]))))]
 
      :in-buf ":in-trg"
      :in-loop [0]
@@ -362,6 +360,8 @@
 (volume! :samplDrum 0.25)
 
 (trg! :samplDrum :sde trg-fx-echo :in-delay-time [0.05] :in-decay-time [0.005] :in-amp [0.1])
+
+(stp :samplDrum)
 
 (defn isno [x] (if (number? x) [x]  (apply conj x)))
 
@@ -381,7 +381,7 @@
                   (if (number? fst)
                     (recur (next xv) (conj result (apply fnc (flatten (conj [fst] args)))))
                     (recur (next xv) (conj result fst)))
-                  (recur (next xv) (conj result (apply map-in (seq [fst fnc args]))) )) ) result))))
+                  (recur (next xv) (conj result (apply map-inner (seq [fst fnc args]))) )) ) result))))
 
 
 (defn map-in [input fnc & args]
@@ -409,20 +409,24 @@
 
 (trg :gb2
      vintage-bass
-     :in-trg (map-in [1 1 [r 1] [(rep 4 1)]] scl 0.05) ;[1 1 1 1] ;[[1 1 r 1] 1 [1 r 1  1] 1] [1 [1 [1 1]] r [1 [1 1]]]
+     :in-trg (map-in [1 1 [r 1] [(rep 6 1)]] scl 0.05)
+    (map-in [1 [1 1] [1 1 1 1] 1] scl 0.05)
+      (map-in  [[1 1 r 1] 1 [1 r 1  1] 1] scl 0.05)
+     (map-in [1 [1 [1 1]] r [1 [1 1]]] scl 0.05)
      ;[(rep 32 1) r 1 (rep 8 1)]
      ; [1 [(rep 16 1)] r [1 1 1 1]]
     ;[(evr 4 1 (partition 1 (sfl (fll 16 [[1] [1] [r]]))))]
      :in-gate-select  [0]
      :in-amp [1]
-     :in-note    (rep 1 [(rep 16 "nc3")])
+     :in-note    ["nc3" "nc3" "nd3" "ne3"]
+     ["nc3" "nd3" ["ne3" "ne3"] "nd2"]
      ;(rep 1 [(rep 16 "ng2")])
      ;(rep 1 [(rep 16 "nbb2")])
      ;(rep 1 [(rep 16 "nf3")])
-     :in-a [0.001]
-     :in-d [0.093]
+     :in-a [0.125]
+     :in-d [0.3]
      :in-s [0.95]
-     :in-r [0.175]; (slw 32 [(range 0.1 1 0.01)])
+     :in-r [0.275]; (slw 32 [(range 0.1 1 0.01)])
      )
 
  (scl 0.25 [1 [1 1] r r])
@@ -431,7 +435,7 @@
 
 
  (trg! :gb2 :gb2d trg-fx-distortion2
-       :in-amount [0.9])
+       :in-amount [0.5])
 
 
 (stp :gb2d)
@@ -442,6 +446,7 @@
 
 (stp :kei)
 (sta)
+
 ;;;;;;;;;;;;;;;,
 ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;
@@ -479,13 +484,15 @@
 
 (t/set-video-fixed 1 :fw)
 
-(def abm (audio-bus-monitor (get-out-bus :smp2)))
+(def abm (audio-bus-monitor (get-out-bus :samplDrum)))
+
+@abm
 
 (on-trigger (get-trigger-id :tick :in-trg) (fn [val]
                                              (let [obv  @abm]
                                                ;(println obv)
                                                (t/set-dataArray-item 0 obv)))
-            :smp2_obv)
+            :samplDrum_obv)
 
 (remove-event-handler :smp2_obv)
 
@@ -506,3 +513,9 @@
 (pause! :op)
 
 (play! :op)
+
+
+
+
+
+(t/toggle-recording "/dev/video1")
