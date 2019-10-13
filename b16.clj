@@ -71,18 +71,17 @@
 
 
 (trg :hhsmp smp
-     :in-trg [1 r r  r] [1 1 1 [ 1 1 1 r]] ;[1] (rep 3 [r]) ;[[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
-     ;[[2 2 2 2] [2 r 2 r] [2 r 2 r] [2 r 2 r]]
+     :in-trg [r] [r] [[1 1] r r 1] [1 [r 1] [1 1] 1]
      :in-step  [2]; (fst 16 [(range -3 3 0.01)])
      :in-loop [0] ;(rep 3 [0])
-     :in-buf ["b cc1"] )
+     :in-buf ["b co2"] )
 
 
-(volume! :hhsmp 0.1)
+(volume! :hhsmp 0.3)
 
 (stp :hhsmp)
 
-(trg! :ksmp :ksmppc trg-fx-pitch-shift :in-pitch-ratio  [0.40] ;(fst 16 [(range 0.7 3 0.01)])
+(trg! :hhsmp :hhsmppc trg-fx-pitch-shift :in-pitch-ratio  (slw 4 [(range 0.5 1.5 0.01)])
       )
 
 (stp :ksmppc)
@@ -124,19 +123,16 @@
 
 (trg :tb303sn
      tb303
-     :in-trg  (rep 4 [r 1 1 [1 1]]
-          [r  [1 1] 1 r]
-          [r [1 1] 1 [1 1]]
-          [[1 1] [r 1] r [r 1]])
-                                        ;(map-in  (rep 1 [(rep 16 1)]) scl 0.1)
-     ;(rep 2  [r])
-     ;(rep 1 [(rep 16 1)])
-     ;(rep 2 [r])
+     :in-trg (map (fn [x] (map-in x scl 0.01)) (rep 4  [r 1 1 [1 1]]
+                                                  [r  [1 1] 1 r]
+                                                  [r [1 1] 1 [1 1]]
+                                                  [[1 1] [r 1] r [r 1]]))
      :in-amp [0.4]
      :in-note  (rep 1  (fll 32 ["n c2" "n c3" "n d1"]) )
      [r]
-      (fll 16 ["n d1" "n c2" "n d3"])                                  ;
-     [r]
+      (fll 64 ["n d1" r "n c2" r r "n d3"])                                  ;
+      (rep 4 [r])
+      (fll 64 ["n e3" r "n c4" r r "n d3"])                                  ;
      :in-gate-select [1]
      :in-attack [0.01]
      :in-decay [0.19]
@@ -154,8 +150,6 @@
 (stp :tb303e)
 
 (stp :tb303sn)
-
-
 
 (trg :tom1
      tom
