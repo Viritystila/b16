@@ -19,7 +19,7 @@
 
 0.5625
 
-(set-pattern-duration (/ 1 (* 1 0.5)))
+(set-pattern-duration (/ 1 (* 2 0.5)))
 
 (set-pattern-delay 0.99)
 
@@ -70,13 +70,17 @@
 (fll 3 1)
 
 
-(trg :ksmp smp
-     :in-trg [1] ;[1] (rep 3 [r]) ;[[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
+(trg :hhsmp smp
+     :in-trg [1 r r  r] [1 1 1 [ 1 1 1 r]] ;[1] (rep 3 [r]) ;[[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
      ;[[2 2 2 2] [2 r 2 r] [2 r 2 r] [2 r 2 r]]
      :in-step  [2]; (fst 16 [(range -3 3 0.01)])
      :in-loop [0] ;(rep 3 [0])
-      :in-buf ["b k1"] )
+     :in-buf ["b cc1"] )
 
+
+(volume! :hhsmp 0.1)
+
+(stp :hhsmp)
 
 (trg! :ksmp :ksmppc trg-fx-pitch-shift :in-pitch-ratio  [0.40] ;(fst 16 [(range 0.7 3 0.01)])
       )
@@ -87,35 +91,87 @@
 
 (stp :ksmp)
 
-(trg :smp smp
-     :in-trg [[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
-     [[2 2 2 2] [2 r 2 r] [2 r 2 r] [2 r 2 r]]
-     :in-step ":in-trg"
-      :in-buf ["b hc4" "b hc3" "b hc4" "b hc3"] )
+(trg :smp smp2
+     :in-trg1 [1 r r  [1 1]]
+     [r  [1 1] r 1]
+     [1 [r 1] r [1 1]]
+     [[1 r] [1 r] r [1 r]]
+     :in-step1 ":in-trg1"
+     :in-loop1 [0]
+     :in-start-pos1 [0]
+     :in-buf1   ["b bd1"]
+     :in-trg2 ;(evr 8 [[(rep 16 1)] r [(rep 32 1)] [(rep 64 1)]])
+     (rep 4 [r 1 r [1 1]]
+          [r  [1 1] 1 r]
+          [r [1 1] 1 [r 1]]
+          [[r 1] [r 1] r [r 1]])
+     :in-step2 ":in-trg2"
+     :in-loop2 [0]
+     :in-start-pos2 [0]
+     :in-buf2  (fll 16 ["b sn1" "bsn2" "bsn3" "bsn4"])
+     :in-amp2 [0.1])
 
-(volume! :smp 0.75)
+(volume! :smp 0.5)
 
 (trg! :smp :fxe1 trg-fx-bitcrusher
-      :in-bits [16] )
+      :in-bits [4] )
 
 (stp :fxe1)
 
 (stp :smp)
 
 
+
+(trg :tb303sn
+     tb303
+     :in-trg  (rep 4 [r 1 1 [1 1]]
+          [r  [1 1] 1 r]
+          [r [1 1] 1 [1 1]]
+          [[1 1] [r 1] r [r 1]])
+                                        ;(map-in  (rep 1 [(rep 16 1)]) scl 0.1)
+     ;(rep 2  [r])
+     ;(rep 1 [(rep 16 1)])
+     ;(rep 2 [r])
+     :in-amp [0.4]
+     :in-note  (rep 1  (fll 32 ["n c2" "n c3" "n d1"]) )
+     [r]
+      (fll 16 ["n d1" "n c2" "n d3"])                                  ;
+     [r]
+     :in-gate-select [1]
+     :in-attack [0.01]
+     :in-decay [0.19]
+     :in-sustain [0.25]
+     :in-release [0.373]
+     :in-r [0.09]
+     :in-cutoff  [800]
+     :in-wave  [0])
+
+(volume! :tb303sn 1)
+
+
+(trg! :tb303sn :tb303e trg-fx-echo :in-decay-time [0.125]  :in-delay-time [0.1] :in-amp [1])
+
+(stp :tb303e)
+
+(stp :tb303sn)
+
+
+
 (trg :tom1
      tom
-     :in-trg [r r r [(rep 8 1)]] [r] ; [1] [(repeat 8 1)] [1 1 1 1] (repeat 5 [r])
-     :in-stick-level [r r r [(range 0.01 5 0.01)]]      ; (rep 13 [0.1]) [3.915]
+     :in-trg [(evr 8 [1 1 r r] (seq [(rep 4 1)]))] ; [1] [(repeat 8 1)] [1 1 1 1] (repeat 5 [r])
+     :in-stick-level [2]; [(range 0.01 5 0.01)] ; (rep 13 [0.1]) [3.915]
      :in-amp [1])
 
-(volume! :tom1 6)
+(volume! :tom1 1)
 
 (pp-node-tree)
 
 (stp :tom1)
 
 (sta)
+
+[(evr 4 [1 2] (seq [(rep 8 1)]))]
 
 (trg :op overpad
      :in-trg ;(map-in [1 1 1 1 1 1 [1 1] [1 [1 r 1 1]]] scl 0.25)
