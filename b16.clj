@@ -19,9 +19,9 @@
 
 0.5625
 
-(set-pattern-duration (/ 1 0.5625))
+(set-pattern-duration (/ 1 (* 1 0.5)))
 
-(set-pattern-delay 0.2)
+(set-pattern-delay 0.99)
 
 
 ;;;;;;
@@ -31,28 +31,31 @@
 (add-tts-sample "k"  "generalx2paradisedaqx2.txt" 200)
 
 (trg :smp2 smp2
-     :in-trg1
-                                      [1 r [r r 1 r] [r r 1 r]]
-     [1 r [r r 1 r] r ]
-     [[1 r 1 r] 1 r [1 1 1 r]]
-     [[1 1 r 1] r [r r 1 r]  r ]
-     ;[[1 1 r 1] r [r r 1 r]  [(rep 8 1)] ]
-     ; [r (fll 4 [1 r])  [1 [1 1] [r r 1] [1 r 1 r]] r]
+     :in-trg1 ;[r]
+     (fst 16 [[(rep 32 1)] r [r r 1 r] [r r 1 r]])
+     ;[1 r [r r 1 r] r ]
+     ;[[1 r 1 r] 1 r [1 1 1 r]]
+     ;[[1 1 r 1] r [r r [(rep 4 1)] r]  r ]
+     ;[[1 1 r 1] r [r r 1 r]  [(rep 16 1)] ]
+
+                                        ; [r (fll 4 [1 r])  [1 [1 1] [r r 1] [1 r 1 r]] r]
 
                                         ;[[(rep 16 1)] r r [(rep 8 1)]]
      ;[[(rep 16 1)] [(rep 8 1)] [[(rep 8 1)] r [(rep 8 1)] r]  [(rep 64 1)] ]
-     :in-trg2  [r 1 r 1]
+     :in-trg2  (rep 4 [r 1 r 1]) [r 1 r [(rep 8 1)]]
+     [[1 1 r 1] r [r r 1 r]  [(rep 8 1)] ]
      :in-buf1  (fll 8 ["b bd3" "b sn1"  "b bd5"  "b sn2"])
      :in-buf2 ["b sn1" "b sn3" ] ["b sn9"]
      :in-step1 [2]
      :in-loop1 [0]
+     :in-loop2 [0]
      :in-amp1 [1.0]
-     :in-amp2 [0.27])
+     :in-amp2 [0.127])
 
 (trg! :smp2 :fxe trg-fx-distortion2
-      :in-amount [0.94] )
+      :in-amount [0.96] )
 
-(volume! :smp2 0.1)
+(volume! :smp2 0.45)
 
 (stp :fxe)
 
@@ -60,17 +63,19 @@
 
 (pause! :smp2)
 
+(play! :smp2)
+
 (sta)
 
 (fll 3 1)
 
 
 (trg :ksmp smp
-     :in-trg [r] ;[1] (rep 3 [r]) ;[[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
+     :in-trg [1] ;[1] (rep 3 [r]) ;[[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
      ;[[2 2 2 2] [2 r 2 r] [2 r 2 r] [2 r 2 r]]
-     :in-step  [5] ;(fst 16 [(range -3 3 0.01)])
-     :in-loop [1] ;(rep 3 [0])
-      :in-buf ["b k"] )
+     :in-step  [2]; (fst 16 [(range -3 3 0.01)])
+     :in-loop [0] ;(rep 3 [0])
+      :in-buf ["b k1"] )
 
 
 (trg! :ksmp :ksmppc trg-fx-pitch-shift :in-pitch-ratio  [0.40] ;(fst 16 [(range 0.7 3 0.01)])
@@ -81,7 +86,6 @@
 (volume! :ksmp 5)
 
 (stp :ksmp)
-
 
 (trg :smp smp
      :in-trg [[2 r 2 r] [2 r 2 r] [2 r 2 r] [2 2 [2 2.1 2.2 r] r]]
@@ -156,7 +160,9 @@
      :in-cutoff [1000]
      :in-wave [0])
 
-(volume! :tb303 5)
+(volume! :tb303 1)
+
+(stp :tb303)
 
 ;Noise guitar
 (trg :bow2o
@@ -291,14 +297,15 @@
 
 (trg :gb
      grunge-bass
-     :in-trg  ["nc3"] [r "ng3"] ["ng2"] [r "nf3"] ["nf2"] [r "nbb3"] ["nbb2"] [r "nc3"]
+     :in-trg  (fst 32 ["nc4"]) ;[r "ng3"] (fst 64 ["ng2"]) [r "nf3"] (fst 32 ["nf2"]) [r "nbb3"] (fst 32 ["nbb2"]) [r "nc3"]
+      ;(fst 4 ["nc3" "nbb2" "ng2" "nf2"])
      :in-gate-select  [1]
      :in-amp [1]
      :in-note  ":in-trg"
      :in-a [0.01]
-     :in-d [0.93]
-     :in-s [0.95]
-     :in-r [0.25]; (slw 32 [(range 0.1 1 0.01)])
+     :in-d [0.293]
+     :in-s [0.295]
+     :in-r [0.5]; (slw 32 [(range 0.1 1 0.01)])
      )
 
 (trg! :gb :gbd trg-fx-distortion2
@@ -308,7 +315,7 @@
 
 (stp :gbe)
 
-(volume! :gb 2.25)
+(volume! :gb 1)
 
 (pause! :gb)
 
