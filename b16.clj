@@ -118,26 +118,26 @@
 (sta)
 
 (trg :op overpad
-     :in-trg ;[1 1 1 1 1 1 [1 1] [1 [r r 1 1]]]
-     (rep 2 (fll 8 (map-in [[(rep 8 1)] [(rep 4 1)]] scl 0.01)))
-     (map-in [(rep 16 1)] scl 0.01)
-     (map-in [(rep 16 [1 r r 1])] scl 0.1)
+     :in-trg ;(map-in [1 1 1 1 1 1 [1 1] [1 [1 r 1 1]]] scl 0.25)
+     ;(rep 2 (fll 8 (map-in [[(rep 8 1)] [(rep 4 1)]] scl 0.01)))
+     ;(map-in [(rep 32 1)] scl 0.01)
+     (map-in [(rep 2 [1 r r 1])] scl 0.1)
                                         ; (mapv (fn [x] (if (number? x) (* x 8) x )) [0.25 0.25 r 0.25])
      ;[0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125]
      ;(fst 2 [0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125])
-     :in-note ["n a2"] ["n c3"] ["n d3"]  ["n e3"]
+     :in-note (fst 16 [["n e2"] ["n a3"] ["n d3"]  ["n c3"]])
      ;(rep 4 (fll 16 ["n a2" "n c3" "n d3" "n e3"]))
                                         ;(slw 2 [ [(chr :c3 :7sus4) ] r (rev [(chr :d3 :7sus4)]) r])
-     :in-gate-select [1]                 ;(rep 16 [1]) (rep 16 [0])
-     :in-attack [0.01]
-     :in-decay  [0.21]
-     :in-sustain [0.34]
-     :in-release [0.33]
+     :in-gate-select [0]                 ;(rep 16 [1]) (rep 16 [0])
+     :in-attack [0.001]
+     :in-decay  [0.51]
+     :in-sustain [0.54]
+     :in-release [0.63]
      :in-amp [1])
 
-(volume! :op 3)
+(volume! :op 0.65)
 
-(trg! :op :ope trg-fx-echo :in-decay-time [1.125]  :in-delay-time [0.0001] :in-amp [0.2])
+(trg! :op :ope trg-fx-echo :in-decay-time [1.125]  :in-delay-time [0.0001] :in-amp [0.05])
 
 (stp :ope)
 
@@ -146,7 +146,7 @@
 
 (trg :tb303
      tb303
-     :in-trg  (rep 1 [(rep 32 1)]) (rep 1 [r])
+     :in-trg  (rep 1 [(rep 32 1)]) ;(rep 1 [r])
      :in-amp [0.4]
      :in-note  (rep 3 (fst (fll 32 ["n c2" "n c1" "n d3"])) )
        (fst (fll 32 ["n d3" "n c2" "n d3"]))                                  ;
@@ -157,10 +157,10 @@
      :in-sustain [0.5]
      :in-release [0.3]
      :in-r [0.09]
-     :in-cutoff [1000]
+     :in-cutoff [1000] [1000]
      :in-wave [0])
 
-(volume! :tb303 1)
+(volume! :tb303 3)
 
 (stp :tb303)
 
@@ -396,17 +396,29 @@
 (add-sample "uh" (string-to-buffer "UHHHHHHHHAAAAAAAAAAAA"))
 
 
+(add-sample "ee" (string-to-buffer "EEEE"))
+
 
 (add-sample "aa" (string-to-buffer "AAAAAAAAAA"))
 
 
+(add-sample "oo" (string-to-buffer "OOOOOOOOOO"))
+
+(add-sample "uhea" (string-to-buffer "UHHHHHHHHEEEEEEEAAAAAAA"))
+
+
+
+
+
+
 (trg :uhsmp smp
-     :in-trg [1 r 1  [(rep 7 1) r (rep 7 1) r]]
-     (rep 3 [1 r 1 r])
-     [1 r 1 [1 1 1 1] 1 r 1 1 1 1 (acc [(rep 8 1)]) 1 1 1 1 [1 1 1 1]]
+     :in-trg [1] [r]
+                                        ;[1 r 1  [(rep 7 1) r (rep 7 1) r]]
+     ;(rep 3 [1 r 1 r])
+     ;[1 r 1 [1 1 1 1] 1 r 1 1 1 1 (acc [(rep 8 1)]) 1 1 1 1 [1 1 1 1]]
      ;(acc [(rep 8 1)])
-     :in-loop [1]
-     :in-buf ["b uh"] ["b aa"]
+     :in-loop [0]
+     :in-buf ["b uhea"] ;["b uh"] ["b oo"] (fst 8 ["b aa" "b ee"])
      :in-amp [2]
      :in-step (fst 1 [(range 1.25 2.75 0.25)])
      )
@@ -415,6 +427,9 @@
        :in-amount (slw 8 [(range 0.1 0.95 0.05)]))
 
 (volume! :uhsmp 0.5)
+
+
+(stp :uhsmp)
 
 (slw 2 (chr :e3 :7sus4))
 
