@@ -130,9 +130,9 @@
      :in-amp [0.4]
      :in-note  (rep 1  (fll 32 ["n c2" "n c3" "n d1"]) )
      [r]
-      (fll 64 ["n d1" r "n c2" r r "n d3"])                                  ;
+      (fll 64 ["n d1" r "n c2" r r "n d3"])
       (rep 4 [r])
-      (fll 64 ["n e3" r "n c4" r r "n d3"])                                  ;
+      (fll 64 ["n e3" r "n c4" r r "n d3"])
      :in-gate-select [1]
      :in-attack [0.01]
      :in-decay [0.19]
@@ -151,9 +151,16 @@
 
 (stp :tb303sn)
 
+
+;good beat (:smp :tb303sn :hhsmp :hhsmppc :op :ope)
+
+(map play! (lss))
+
+(sta)
+
 (trg :tom1
      tom
-     :in-trg [(evr 8 [1 1 r r] (seq [(rep 4 1)]))] ; [1] [(repeat 8 1)] [1 1 1 1] (repeat 5 [r])
+     :in-trg (rep 3 [r]) [1 r 1 r r 1 r [1 1 1 1]] ; [1] [(repeat 8 1)] [1 1 1 1] (repeat 5 [r])
      :in-stick-level [2]; [(range 0.01 5 0.01)] ; (rep 13 [0.1]) [3.915]
      :in-amp [1])
 
@@ -168,26 +175,20 @@
 [(evr 4 [1 2] (seq [(rep 8 1)]))]
 
 (trg :op overpad
-     :in-trg ;(map-in [1 1 1 1 1 1 [1 1] [1 [1 r 1 1]]] scl 0.25)
-     ;(rep 2 (fll 8 (map-in [[(rep 8 1)] [(rep 4 1)]] scl 0.01)))
-     ;(map-in [(rep 32 1)] scl 0.01)
-     (map-in [(rep 2 [1 r r 1])] scl 0.1)
-                                        ; (mapv (fn [x] (if (number? x) (* x 8) x )) [0.25 0.25 r 0.25])
-     ;[0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125]
-     ;(fst 2 [0.25 (fll 4 [0.0125 0.0125]) 0.125 0.125])
-     :in-note (fst 16 [["n e2"] ["n a3"] ["n d3"]  ["n c3"]])
-     ;(rep 4 (fll 16 ["n a2" "n c3" "n d3" "n e3"]))
-                                        ;(slw 2 [ [(chr :c3 :7sus4) ] r (rev [(chr :d3 :7sus4)]) r])
+     :in-trg
+     (map-in [(rep 2 [1 r r 1])] scl 0.05)
+     :in-note (rep 4 (fst 8 ["n e2" "n a3" "n d3"  "n c3"]))
+     (rep 4 (fst 8 ["n e2" "n d4" "n d3"  "n c3"]))
      :in-gate-select [0]                 ;(rep 16 [1]) (rep 16 [0])
-     :in-attack [0.001]
-     :in-decay  [0.51]
-     :in-sustain [0.54]
-     :in-release [0.63]
+     :in-attack [0.01]
+     :in-decay  [0.21]
+     :in-sustain [0.954]
+     :in-release [1.3]
      :in-amp [1])
 
-(volume! :op 0.65)
+(volume! :op 0.45)
 
-(trg! :op :ope trg-fx-echo :in-decay-time [1.125]  :in-delay-time [0.0001] :in-amp [0.05])
+(trg! :op :ope trg-fx-echo :in-decay-time [0.25]  :in-delay-time [0.001] :in-amp [0.05])
 
 (stp :ope)
 
