@@ -4,7 +4,8 @@
         [trigger.algo]
         [trigger.speech]
         [trigger.samples]
-        [trigger.trg_fx] [overtone.core]) (:require [viritystone.tone :as t]))
+        [trigger.trg_fx] [overtone.core])
+  (:require [viritystone.tone :as t]))
 
 (future
   (println "Begin loading SuperDirt samples")
@@ -14,6 +15,7 @@
 (defn add-tts-sample [name path nosamples]
   (future
     (println "Begin loading sample " name)
+
     (add-sample name (string-to-buffer (generate-markov-text path nosamples)))
     (println "Sample" name "loaded") ))
 
@@ -443,6 +445,7 @@
 
 (stp :bow2)
 
+(sta)
 
 (add-sample "uh" (string-to-buffer "UHHHHHHHHAAAAAAAAAAAA"))
 
@@ -651,6 +654,15 @@
 ;;;;;;
 (t/start "./b16.glsl" :width 1920 :height 1080 :cams [0] :videos ["../videos/soviet1.mp4" "../videos/uni_fixed.mp4" "../videos/soviet4.mp4" "../videos/spede_fixed.mp4"])
 
+(t/post-start-cam 3)
+
+(t/set-cam-fps 3 1)
+
+(t/start "./b16.glsl" :width 1920 :height 1080 :cams [0])
+
+
+(t/stop)
+
 (t/bufferSection 0 0 16925)
 
 (t/set-video-fixed 0 :fw)
@@ -693,4 +705,4 @@
 
 
 
-(t/toggle-recording "/dev/video1")
+(t/toggle-recording "/dev/video2")
